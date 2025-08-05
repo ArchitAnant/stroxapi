@@ -68,7 +68,7 @@ def main(args):
     checkpoint_file = os.path.join(args.save, 'checkpoint.pt')
     if args.cont_training:
         logging.info('loading the model.')
-        checkpoint = torch.load(checkpoint_file, map_location='cpu')
+        checkpoint = torch.load(checkpoint_file, map_location='cpu',weights_only=True)
         init_epoch = checkpoint['epoch']
         model.load_state_dict(checkpoint['state_dict'])
         model = model.cuda()
