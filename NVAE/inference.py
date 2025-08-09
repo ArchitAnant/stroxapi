@@ -115,7 +115,7 @@ class NVAEInference:
         writer = utils.Writer(args.global_rank, args.save)
 
         self.model = AutoEncoder(args, writer, arch_instance)
-        checkpoint = torch.load(model_path, map_location=device)
+        checkpoint = torch.load(model_path, map_location=device,weights_only=True)
         self.model.load_state_dict(checkpoint['model'])
         self.model.to(device)
         self.device = device
