@@ -107,7 +107,7 @@ class AutoEncoder(nn.Module):
         self.writer = writer
         self.arch_instance = arch_instance
         self.dataset = args.dataset
-        self.crop_output = self.dataset in {'mnist', 'omniglot', 'stacked_mnist'}
+        self.crop_output = False#self.dataset in {'mnist', 'omniglot', 'stacked_mnist'}
         self.use_se = args.use_se
         self.res_dist = args.res_dist
         self.num_bits = args.num_x_bits
