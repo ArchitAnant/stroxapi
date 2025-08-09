@@ -116,7 +116,7 @@ class NVAEInference:
 
         self.model = AutoEncoder(args, writer, arch_instance)
         checkpoint = torch.load(model_path, map_location=device,weights_only=True)
-        self.model.load_state_dict(checkpoint['model'])
+        self.model.load_state_dict(checkpoint['state_dict'])
         self.model.to(device)
         self.device = device
         self.model.eval()
