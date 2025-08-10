@@ -121,27 +121,20 @@ class NVAEInference:
         self.device = device
         self.model.eval()
 
-    def run_encoder(self, data_batch):
+    def get_logits(self, data_batch):
         with torch.inference_mode():
             data_batch = data_batch.to(self.device)
-            latent = self.model.encoder(data_batch)
-        return latent
+            logits, *_ = self.model(data_batch)
+        return logits
 
-    def run_decoder(self, latent_batch):
+    def run_decoder(self, logits):
         with torch.inference_mode():
-            latent_batch = latent_batch.to(self.device)
-            recon = self.model.decoder(latent_batch)
-        return recon
+            logits = logits.to(self.device)
+            output = self.model.decoder_output(logits)
+        return output
+    
+    def generate_sample(self,output):
+        output_img = output.mean if isinstance(output, torch.distributions.bernoulli.Bernoulli) \
+                    else output.sample()
+        return output_img
 
-
-# if __name__ == '__main__':
-#     model_path = './checkpoint.pt'  # replace with your actual checkpoint path
-#     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-#     inference_engine = NVAEInference(model_path, device)
-
-#     dummy_input = torch.randn(2, 1, 128, 128)  # Adjust shape based on dataset
-#     latents = inference_engine.run_encoder(dummy_input)
-#     outputs = inference_engine.run_decoder(latents)
-
-#     print("Latents shape:", latents.shape)
-#     print("Reconstructed output shape:", outputs.shape)
