@@ -1,4 +1,5 @@
 .DS_Store
-temp.py
+temp.*
 .env
 .vscode
+*cache*
