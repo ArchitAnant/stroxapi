@@ -22,10 +22,55 @@ def load_checkpoint(ckpt_path: str):
 
     return state_dict
 
-def export_torchscript(model, output_path: str, input_shape=(1, 3, 256, 256)):
+def export_torchscript(model, output_path: str, args):
     model.eval()
-    example_input = torch.randn(*input_shape).half().cuda()  # FP16
-    traced_model = torch.jit.trace(model.cuda(), example_input)
+    
+    # Create dummy inputs matching the diffusion model's expected inputs
+    batch_size = 1
+    
+    # For latent diffusion: (batch, 4, height//8, width//8)
+    if args.latent:
+        img_height, img_width = args.img_size if isinstance(args.img_size, tuple) else (64, 256)
+        input_shape = (batch_size, 4, img_height // 8, img_width // 8)
+    else:
+        input_shape = (batch_size, 3, 64, 256)
+    
+    # Create dummy inputs matching the forward signature: (x, timesteps, context, y, style_extractor)
+    x = torch.randn(*input_shape).half().cuda()
+    timesteps = torch.randint(0, 1000, (batch_size,)).cuda()
+    
+    # Create dummy text features based on model type
+    if args.model_name == 'diffusionpen':
+        # CANINE tokenizer output format (max_length=40 from train.py)
+        context = {
+            'input_ids': torch.randint(0, 1000, (batch_size, 40)).cuda(),
+            'attention_mask': torch.ones(batch_size, 40).cuda()
+        }
+    else:
+        # Wordstylist uses simple tensor (OUTPUT_MAX_LEN=95 from train.py)
+        context = torch.randint(0, 100, (batch_size, 95)).cuda()
+    
+    # Style class labels (y = s_id from training)
+    if args.dataset == 'iam':
+        num_classes = 339
+    elif args.dataset == 'gnhk':
+        num_classes = 515
+    else:
+        num_classes = 339
+    y = torch.randint(0, num_classes, (batch_size,)).cuda()
+    
+    # Dummy style features (MobileNetV2 output size)
+    style_extractor = torch.randn(batch_size, 1280).half().cuda()
+    
+    # Trace the model with the correct forward signature
+    model = model.cuda().half()
+    with torch.no_grad():
+        traced_model = torch.jit.trace(
+            model, 
+            (x, timesteps, context, y, style_extractor),
+            strict=False
+        )
+    
     traced_model.save(output_path)
     print(f"TorchScript inference model saved at: {output_path}")
     
@@ -67,19 +112,48 @@ def main():
     state_dict = load_checkpoint(args.ckpt)
     print("Loaded checkpoint from:", args.ckpt)
 
-    # --- Initialize your model with the proper arguments ---
+    # --- Initialize your model with the proper arguments (matching train.py) ---
+    
+    # Set style_classes based on dataset (from train.py)
+    if args.dataset == 'iam':
+        style_classes = 339
+    elif args.dataset == 'gnhk':
+        style_classes = 515
+    else:
+        style_classes = 339  # default to IAM
+    
+    # Character classes and vocab_size calculation (from train.py)
+    character_classes = ['!', '"', '#', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '?', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ']
+    
+    if args.model_name == 'wordstylist':
+        vocab_size = len(character_classes) + 2
+    else:
+        vocab_size = len(character_classes)
+    
+    # Initialize text encoder if needed (from train.py)
+    text_encoder = None
+    if args.model_name == 'diffusionpen':
+        from transformers import CanineModel, CanineTokenizer
+        import torch.nn as nn
+        text_encoder = CanineModel.from_pretrained("google/canine-c")
+        # Note: For inference, we don't need DataParallel, just move to device
+        text_encoder = text_encoder.to('cuda' if torch.cuda.is_available() else 'cpu')
+    
+    # Create model with exact same parameters as train.py
     model = UNetModel(
-        image_size=(64, 256),        # your training image size
-        in_channels=4,               # channels from training
-        model_channels=320,          # emb_dim from training
-        out_channels=4,              # same as in_channels
-        num_res_blocks=1,            # from training
-        attention_resolutions=(1, 1),# example value, adjust if needed
-        channel_mult=(1, 1),         # same as training
-        num_heads=4,                 # from training
-        num_classes=None,            # set if your model is class-conditional
-        # You can also pass context_dim, vocab_size, text_encoder if used
-        args=args
+        image_size=args.img_size,            # from args
+        in_channels=args.channels,           # from args
+        model_channels=args.emb_dim,         # from args
+        out_channels=args.channels,          # same as in_channels
+        num_res_blocks=args.num_res_blocks,  # from args
+        attention_resolutions=(1, 1),        # from train.py
+        channel_mult=(1, 1),                 # from train.py
+        num_heads=args.num_heads,            # from args
+        num_classes=style_classes,           # calculated above
+        context_dim=args.emb_dim,            # from train.py
+        vocab_size=vocab_size,               # calculated above
+        text_encoder=text_encoder,           # initialized above
+        args=args                            # pass args
     )
 
     # Load checkpoint
@@ -87,7 +161,7 @@ def main():
     print("Model weights loaded.")
 
     # Export TorchScript
-    export_torchscript(model, args.output)
+    export_torchscript(model, args.output, args)
     print("Export completed.")
 
 
