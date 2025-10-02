@@ -191,14 +191,14 @@ def main():
 
 	# VAE + scheduler (only when latent)
 	if args.latent:
-		vae = AutoencoderKL.from_pretrained("runwayml/stable-diffusion-v1-5", subfolder="vae").to(device)
+		vae = AutoencoderKL.from_pretrained(args.stable_dif_path, subfolder="vae").to(device)
 		vae.eval()
 	else:
 		vae = None
-	scheduler = DDIMScheduler.from_pretrained("runwayml/stable-diffusion-v1-5", subfolder="scheduler")
+	scheduler = DDIMScheduler.from_pretrained(args.stable_dif_path, subfolder="scheduler")
 
 	# Style encoder: output must be 1280-dim to match UNet.style_lin
-	style_encoder = MobileNetV3Style(embedding_dim=512).to(device)
+	style_encoder = MobileNetV3Style(embedding_dim=1280).to(device)
 	style_encoder.eval()
 	load_state_safely(style_encoder, args.style_encoder_ckpt, map_location=device)
 
