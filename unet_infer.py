@@ -200,7 +200,8 @@ def main():
 
 	# Style encoder: output must be 1280-dim to match UNet.style_lin
 	style_encoder = MobileNetV3Style(embedding_dim=1280).to(device)
-	load_state_safely(style_encoder, args.style_encoder_ckpt, map_location=device)
+	style_encoder.load_state_dict(torch.load(args.style_encoder_ckpt,map_location=device,weights_only=True))
+	# load_state_safely(style_encoder, args.style_encoder_ckpt, map_location=device)
 	style_encoder.eval()
 
 	# Build style feature batch (5 refs expected by UNet forward; repeat if fewer)
