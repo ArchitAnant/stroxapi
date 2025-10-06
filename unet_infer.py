@@ -50,40 +50,28 @@ def white_pad_to_width(img: Image.Image, target_h: int = 64, target_w: int = 256
 		return canvas
 	return img
 
-def load_state_safely(module: nn.Module, state_dict_path: str, device: torch.device):
-    sd = torch.load(state_dict_path, map_location=device)
 
-    # handle checkpoints saved with wrappers
-    if isinstance(sd, dict) and "state_dict" in sd:
-        sd = sd["state_dict"]
+def load_state_safely(module: nn.Module, state_dict_path: str, map_location: torch.device):
+	sd = torch.load(state_dict_path, map_location=map_location)
+	# handle checkpoints saved with wrappers
+	if isinstance(sd, dict) and "state_dict" in sd:
+		sd = sd["state_dict"]
+	# strip possible prefixes like 'module.'
+	new_sd = {}
+	for k, v in sd.items():
+		if k.startswith("module."):
+			new_k = k[len("module."):]
+		elif k.startswith("model."):
+			new_k = k[len("model."):]
+		else:
+			new_k = k
+		new_sd[new_k] = v
+	missing, unexpected = module.load_state_dict(new_sd, strict=False)
+	if missing:
+		print(f"[warn] Missing keys when loading {state_dict_path}: {len(missing)}")
+	if unexpected:
+		print(f"[warn] Unexpected keys when loading {state_dict_path}: {len(unexpected)}")
 
-    # strip possible prefixes like 'module.' or 'model.'
-    new_sd = {}
-    for k, v in sd.items():
-        if k.startswith("module."):
-            new_k = k[len("module."):]
-        elif k.startswith("model."):
-            new_k = k[len("model."):]
-        else:
-            new_k = k
-
-        # ✅ Move tensors to the correct device
-        if isinstance(v, torch.Tensor):
-            new_sd[new_k] = v.to(device)
-        else:
-            new_sd[new_k] = v
-
-    missing, unexpected = module.load_state_dict(new_sd, strict=False)
-
-    # ✅ PRINT actual names to inspect
-    if missing:
-        print(f"\n[warn] Missing keys when loading {state_dict_path}: {len(missing)}")
-        print("  → First 15 missing keys:", missing[:15])
-    if unexpected:
-        print(f"[warn] Unexpected keys when loading {state_dict_path}: {len(unexpected)}")
-        print("  → First 15 unexpected keys:", unexpected[:15])
-
-    return missing, unexpected
 
 def build_transforms():
 	return transforms.Compose([
@@ -200,9 +188,7 @@ def main():
 
 	unet = UNetModel(**unet_cfg).to(device)
 	unet.eval()
-	load_state_safely(unet, args.unet_ckpt, device)
-	# state_dict = torch.load(args.unet_ckpt, map_location=device)
-	# unet.load_state_dict(state_dict, strict=False)
+	load_state_safely(unet, args.unet_ckpt, map_location=device)
 
 	# VAE + scheduler (only when latent)
 	if args.latent:
@@ -215,9 +201,7 @@ def main():
 	# Style encoder: output must be 1280-dim to match UNet.style_lin
 	style_encoder = ImageEncoder(model_name='mobilenetv2_100', num_classes=0, pretrained=True, trainable=False)#MobileNetV3Style(embedding_dim=1280).to(device)
 	style_encoder.eval()
-	# load_state_safely(style_encoder, args.style_encoder_ckpt, device)
-	state_dict = torch.load(args.style_encoder_ckpt, map_location=device)
-	style_encoder.load_state_dict(state_dict, strict=False)
+	load_state_safely(style_encoder, args.style_encoder_ckpt, map_location=device)
 
 	# Build style feature batch (5 refs expected by UNet forward; repeat if fewer)
 	refs = args.style_refs
