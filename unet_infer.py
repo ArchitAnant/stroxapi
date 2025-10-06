@@ -191,9 +191,11 @@ def main():
 
 	new_state_dict = OrderedDict()
 	for k, v in state_dict.items():
-		# Remove 'module.' anywhere in the key
-		new_key = k.replace("module.", "")
-		new_state_dict[new_key] = v
+		if "module." in k:
+			k = k.replace("module.", "")
+		if k == "label_emb.weight":  # skip this one
+			continue
+		new_state_dict[k] = v
 
 	# Now load
 	unet.load_state_dict(new_state_dict)
