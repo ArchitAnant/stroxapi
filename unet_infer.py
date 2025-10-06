@@ -200,7 +200,7 @@ def main():
 
 	unet = UNetModel(**unet_cfg).to(device)
 	unet.eval()
-	load_state_safely(unet, args.unet_ckpt, map_location=device)
+	load_state_safely(unet, args.unet_ckpt, device)
 
 	# VAE + scheduler (only when latent)
 	if args.latent:
@@ -213,7 +213,7 @@ def main():
 	# Style encoder: output must be 1280-dim to match UNet.style_lin
 	style_encoder = ImageEncoder(model_name='mobilenetv2_100', num_classes=0, pretrained=True, trainable=False)#MobileNetV3Style(embedding_dim=1280).to(device)
 	style_encoder.eval()
-	load_state_safely(style_encoder, args.style_encoder_ckpt, map_location=device)
+	load_state_safely(style_encoder, args.style_encoder_ckpt, device)
 
 	# Build style feature batch (5 refs expected by UNet forward; repeat if fewer)
 	refs = args.style_refs
