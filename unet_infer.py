@@ -187,7 +187,18 @@ def main():
 	)
 
 	unet = UNetModel(**unet_cfg).to(device)
-	load_state_safely(unet, args.unet_ckpt, map_location=device)
+	state_dict = torch.load(args.unet_ckpt, map_location=device)
+
+	# If trained with DataParallel, remove the 'module.' prefix
+	from collections import OrderedDict
+	new_state_dict = OrderedDict()	
+	for k, v in state_dict.items():
+		if k.startswith("module."):
+			new_state_dict[k[7:]] = v  # strip 'module.'
+		else:
+			new_state_dict[k] = v
+
+	unet.load_state_dict(new_state_dict)
 	unet.eval()
 	
 
