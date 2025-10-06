@@ -201,7 +201,8 @@ def main():
 	unet = UNetModel(**unet_cfg).to(device)
 	unet.eval()
 	# load_state_safely(unet, args.unet_ckpt, device)
-	unet.load_state_dict(torch.load(args.unet_ckpt, weights_only=True,map_location=device)["state_dict"])  # verify file exists
+	state_dict = torch.load(args.unet_ckpt, map_location=device)
+	unet.load_state_dict(state_dict, strict=False)
 
 	# VAE + scheduler (only when latent)
 	if args.latent:
@@ -215,7 +216,9 @@ def main():
 	style_encoder = ImageEncoder(model_name='mobilenetv2_100', num_classes=0, pretrained=True, trainable=False)#MobileNetV3Style(embedding_dim=1280).to(device)
 	style_encoder.eval()
 	# load_state_safely(style_encoder, args.style_encoder_ckpt, device)
-	style_encoder.load_state_dict(torch.load(args.style_encoder_ckpt, weights_only=True,map_location=device)["state_dict"])  # verify file exists
+	state_dict = torch.load(args.style_encoder_ckpt, map_location=device)
+	style_encoder.load_state_dict(state_dict, strict=False)
+
 	# Build style feature batch (5 refs expected by UNet forward; repeat if fewer)
 	refs = args.style_refs
 	if len(refs) < 5:
