@@ -199,7 +199,7 @@ def main():
 	scheduler = DDIMScheduler.from_pretrained(args.stable_dif_path, subfolder="scheduler")
 
 	# Style encoder: output must be 1280-dim to match UNet.style_lin
-	style_encoder = ImageEncoder(model_name='mobilenetv2_100', num_classes=0, pretrained=True, trainable=False)#MobileNetV3Style(embedding_dim=1280).to(device)
+	style_encoder = MobileNetV3Style(embedding_dim=1280).to(device)
 	load_state_safely(style_encoder, args.style_encoder_ckpt, map_location=device)
 	style_encoder.eval()
 
