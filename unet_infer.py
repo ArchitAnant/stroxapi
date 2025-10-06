@@ -200,9 +200,9 @@ def main():
 
 	unet = UNetModel(**unet_cfg).to(device)
 	unet.eval()
-	# load_state_safely(unet, args.unet_ckpt, device)
-	state_dict = torch.load(args.unet_ckpt, map_location=device)
-	unet.load_state_dict(state_dict, strict=False)
+	load_state_safely(unet, args.unet_ckpt, device)
+	# state_dict = torch.load(args.unet_ckpt, map_location=device)
+	# unet.load_state_dict(state_dict, strict=False)
 
 	# VAE + scheduler (only when latent)
 	if args.latent:
