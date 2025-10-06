@@ -187,7 +187,14 @@ def main():
 	)
 
 	unet = UNetModel(**unet_cfg).to(device)
-	load_state_safely(unet, args.unet_ckpt, map_location=device)
+	# load_state_safely(unet, args.unet_ckpt, map_location=device)
+	# unet.eval()
+	unet = UNetModel(**unet_cfg).to(device)
+	state = torch.load("/content/ema_ckpt.pt", map_location=device)
+	model_state = unet.state_dict()
+	filtered_state = {k: v for k, v in state.items() if k in model_state}
+
+	unet.load_state_dict(filtered_state, strict=False)
 	unet.eval()
 
 	# VAE + scheduler (only when latent)
