@@ -210,6 +210,9 @@ def main():
 	elif len(refs) > 5:
 		refs = refs[:5]
 	style_batch = prepare_style_batch(refs, args.img_h, args.img_w).to(device)
+	# ensure style encoder weights and input are on same device & dtype
+	style_encoder = style_encoder.to(device)
+	style_batch = style_batch.to(device=device, dtype=next(style_encoder.parameters()).dtype)
 	with torch.inference_mode():
 		style_feats = style_encoder(style_batch)  # [5, 1280]
 
