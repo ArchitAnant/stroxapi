@@ -1,6 +1,6 @@
 import argparse
 import os
-from typing import List, Optional
+from typing import List, Optional, OrderedDict
 
 import torch
 import torch.nn as nn
@@ -189,15 +189,13 @@ def main():
 	unet = UNetModel(**unet_cfg).to(device)
 	state_dict = torch.load(args.unet_ckpt, map_location=device)
 
-	# If trained with DataParallel, remove the 'module.' prefix
-	from collections import OrderedDict
-	new_state_dict = OrderedDict()	
+	new_state_dict = OrderedDict()
 	for k, v in state_dict.items():
-		if k.startswith("module."):
-			new_state_dict[k[7:]] = v  # strip 'module.'
-		else:
-			new_state_dict[k] = v
+		# Remove 'module.' anywhere in the key
+		new_key = k.replace("module.", "")
+		new_state_dict[new_key] = v
 
+	# Now load
 	unet.load_state_dict(new_state_dict)
 	unet.eval()
 	
