@@ -4,7 +4,6 @@ from typing import List, Optional
 
 import torch
 import torch.nn as nn
-from torch.nn import DataParallel
 from PIL import Image
 from torchvision import transforms
 
@@ -188,7 +187,6 @@ def main():
 	)
 
 	unet = UNetModel(**unet_cfg).to(device)
-	unet = DataParallel(unet, device_ids=[3,4])
 	load_state_safely(unet, args.unet_ckpt, map_location=device)
 	unet.eval()
 
