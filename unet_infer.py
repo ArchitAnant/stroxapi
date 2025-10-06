@@ -150,7 +150,7 @@ def main():
 	parser.add_argument("--out", type=str, default="out.png", help="Output image path")
 	parser.add_argument("--stable_dif_path", type=str, default="./stable-diffusion-v1-5", help="Path to Stable Diffusion v1-5 folder (for VAE & scheduler)")
 	parser.add_argument("--device", type=str, default=None)
-	parser.add_argument("--img_h", type=int, default=64)
+	parser.add_argument("--img_h", type=int, default=256)
 	parser.add_argument("--img_w", type=int, default=256)
 	parser.add_argument("--channels", type=int, default=4)
 	parser.add_argument("--emb_dim", type=int, default=320)
