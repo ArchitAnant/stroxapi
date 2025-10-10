@@ -150,7 +150,7 @@ def main():
 	parser.add_argument("--out", type=str, default="out.png", help="Output image path")
 	parser.add_argument("--stable_dif_path", type=str, default="./stable-diffusion-v1-5", help="Path to Stable Diffusion v1-5 folder (for VAE & scheduler)")
 	parser.add_argument("--device", type=str, default=None)
-	parser.add_argument("--img_h", type=int, default=256)
+	parser.add_argument("--img_h", type=int, default=64)
 	parser.add_argument("--img_w", type=int, default=256)
 	parser.add_argument("--channels", type=int, default=4)
 	parser.add_argument("--emb_dim", type=int, default=320)
@@ -211,10 +211,8 @@ def main():
 	scheduler = DDIMScheduler.from_pretrained(args.stable_dif_path, subfolder="scheduler")
 
 	# Style encoder: output must be 1280-dim to match UNet.style_lin
-	style_encoder = ImageEncoder(model_name='mobilenetv2_100', num_classes=0, pretrained=True, trainable=False)
-	state = torch.load("/content/iam_style_diffusionpen.pth", map_location=device)
-	state.pop("classifier.weight", None)
-	state.pop("classifier.bias", None)
+	style_encoder = MobileNetV3Style(embedding_dim=1280)#ImageEncoder(model_name='mobilenetv2_100', num_classes=0, pretrained=True, trainable=False)
+	state = torch.load(args.style_encoder_ckpt, map_location=device)
 	style_encoder.load_state_dict(state)
 	style_encoder.eval()
 

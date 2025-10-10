@@ -7,7 +7,7 @@ class MobileNetV3Style(nn.Module):
   def __init__(self,embedding_dim=512):
     super().__init__()
 
-    self.backbone = models.mobilenet_v3_small(pretrained = True)
+    self.backbone = models.mobilenet_v3_large(pretrained = True)
     self.backbone.classifier = nn.Identity()
     self.embedding_head = nn.Linear(self.backbone.features[-1].out_channels, embedding_dim)
 

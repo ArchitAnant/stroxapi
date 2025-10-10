@@ -14,7 +14,7 @@ NUM_EPOCHS = 20
 LR = 1e-3
 MARGIN=1.0
 P=2
-EMBEDDINGS_DIM=512
+EMBEDDINGS_DIM=1280
 
 
 model = MobileNetV3Style(embedding_dim=EMBEDDINGS_DIM).to(device)
