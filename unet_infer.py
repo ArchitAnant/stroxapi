@@ -208,7 +208,7 @@ def main():
 		vae.eval()
 	else:
 		vae = None
-	scheduler = DDIMScheduler.from_pretrained(args.stable_dif_path, subfolder="scheduler")
+	scheduler = DDIMScheduler.from_pretrained("stable-diffusion-v1-5/stable-diffusion-v1-5", subfolder="scheduler")
 
 	# Style encoder: output must be 1280-dim to match UNet.style_lin
 	style_encoder = MobileNetV3Style(embedding_dim=1280)#ImageEncoder(model_name='mobilenetv2_100', num_classes=0, pretrained=True, trainable=False)
