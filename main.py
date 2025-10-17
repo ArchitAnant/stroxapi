@@ -152,7 +152,7 @@ def main_sample(
 	)
 
 	unet = UNetModel(**unet_cfg).to(device)
-	state_dict = torch.load("ema_ckpt.pth", map_location=device)
+	state_dict = torch.load("ema_ckpt.pt", map_location=device)
 
 	new_state_dict = OrderedDict()
 	for k, v in state_dict.items():
