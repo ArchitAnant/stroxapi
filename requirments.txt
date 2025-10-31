@@ -1,5 +1,0 @@
-google-genai
-torch
-tqdm
-transformers
-diffusers

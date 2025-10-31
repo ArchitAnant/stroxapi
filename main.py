@@ -1,5 +1,3 @@
-import argparse
-import os
 from typing import List, Optional, OrderedDict
 
 import torch
@@ -10,7 +8,7 @@ from torchvision import transforms
 from diffusers import AutoencoderKL, DDIMScheduler
 from transformers import CanineTokenizer, CanineModel
 
-from diff_unet import UNetModel
+from diffusion_pen.diff_unet import UNetModel
 from style_encoder.model import MobileNetV3Style
 
 from postpocessing.utils import form_line

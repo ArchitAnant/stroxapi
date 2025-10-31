@@ -3,3 +3,4 @@ temp.*
 .env
 .vscode
 *cache*
+out/
