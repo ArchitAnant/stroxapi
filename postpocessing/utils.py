@@ -162,7 +162,7 @@ def form_line(image_path_list,text):
   base_image = Image.open(image_path_list[0]).convert('L')
   base_image_tensor = clip_image(transforms.ToTensor()(base_image))
   base_image_line = analyse_word(base_image_tensor)
-  text = text.split()[1:]
+  text = text[1:]
 
   img_tensors = [base_image_tensor]
 

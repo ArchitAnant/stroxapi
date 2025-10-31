@@ -13,6 +13,8 @@ from transformers import CanineTokenizer, CanineModel
 from diff_unet import UNetModel
 from style_encoder.model import MobileNetV3Style
 
+from postpocessing.utils import form_line
+
 
 def white_pad_to_width(img: Image.Image, target_h: int = 64, target_w: int = 256) -> Image.Image:
 	# keep aspect by resizing height to target_h, then pad/crop width to target_w
@@ -193,6 +195,8 @@ def main_sample(
 	with torch.inference_mode():
 		style_feats = style_encoder(style_batch)  # [5, 1280]
 	word_count = 0
+
+	file_paths = []
 	# Sample
 	for text in text_list:
 		word_count+=1
@@ -214,5 +218,11 @@ def main_sample(
 		if image.size(0) == 4:  # latent decoded returns 3 channels
 			image = image[:3]
 		pil = transforms.ToPILImage()(image)
-		pil.save(f"{out}/generated_{word_count}.png")
-		print(f"Saved image to {out}/generated_{word_count}.png")
+		file_path = f"{out}/generated_{word_count}.png"
+		pil.save(file_path)
+		file_paths.append(file_path)
+		print(f"Saved image to {file_path}")
+	
+	line_tensor = form_line(file_paths, text_list)
+	return line_tensor
+	
