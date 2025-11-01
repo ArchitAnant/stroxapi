@@ -37,3 +37,8 @@ async def generate_handwriting(texts: List[str], style_images: List[UploadFile])
         out=output_path
     )
     return {"message": "Handwriting generation completed.", "output_path": output_path}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+    
