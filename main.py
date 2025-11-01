@@ -1,6 +1,8 @@
+import os
 import torch
 from typing import List
 from model_inference import main_sample
+from contextlib import asynccontextmanager
 from model_pipeline import ModelPipeline
 from fastapi import FastAPI, UploadFile, File
 
@@ -8,7 +10,7 @@ app = FastAPI(title="Strox Handwrting Generation API")
 
 pipeline = None
 
-@app.lifecycle_event("startup")
+@asynccontextmanager
 def load_models():
     global pipeline
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -18,6 +20,14 @@ def load_models():
         style_encoder_path="mobilenetv3_iam_style_MIII-P5.pth",
         device=device
     )
+    yield
+    # if the out/ folder path exist delete that
+    if os.path.exists("out/"):
+        for f in os.listdir("out/"):
+            os.remove(os.path.join("out/", f))
+        os.rmdir("out/")
+
+
 
 @app.post("/generate/")
 async def generate_handwriting(texts: List[str], style_images: List[UploadFile]):
@@ -41,4 +51,3 @@ async def generate_handwriting(texts: List[str], style_images: List[UploadFile])
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-    
