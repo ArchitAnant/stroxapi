@@ -7,3 +7,13 @@ This is the docker container is for backend for the Strox App.
 This projects implements the DiffusionPen paper. which you can find here [ArXiv](http://www.arxiv.org/abs/2409.06065) 
 
 ### Things I have changed
+**Style Encoder**
+
+The original paper used `mobilenet_v2_100` model. I swapped it out with `MobileNetV3`.
+
+
+**VAE Decoder**
+
+The Original paper used the out of the box `stable-diffusion-v1-5` for the decoder. I just fine-tuned it on `IAM-Dataset`.
+
+

@@ -12,5 +12,5 @@ scikit-image
 torch
 torchvision
 tqdm
-transformers
+transformers  
 wandb
