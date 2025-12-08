@@ -3,3 +3,4 @@ torch
 tqdm
 transformers
 diffusers
+azure-storage-blob

@@ -133,30 +133,30 @@ def resize_img(curr_img: torch.Tensor,
     return aligned
 
 
-def stitch_images_side_by_side(image_tensors):
-    """
-    Stitches a list of image tensors side by side with random padding between them.
+# def stitch_images_side_by_side(image_tensors):
+#     """
+#     Stitches a list of image tensors side by side with random padding between them.
 
-    Args:
-        image_tensors (list): A list of torch.Tensor images (assuming same height and channels).
+#     Args:
+#         image_tensors (list): A list of torch.Tensor images (assuming same height and channels).
 
-    Returns:
-        torch.Tensor: A single tensor with images stitched side by side with padding.
-    """
-    if not image_tensors:
-        return None
+#     Returns:
+#         torch.Tensor: A single tensor with images stitched side by side with padding.
+#     """
+#     if not image_tensors:
+#         return None
 
-    stitched_image = image_tensors[0]
+#     stitched_image = image_tensors[0]
 
-    for i in range(1, len(image_tensors)):
-        # Determine random padding width (e.g., between 5 and 20 pixels)
-        padding_width = random.randint(15, 20)
-        # For PyTorch-style tensors (C, H, W)
-        C, H, W = stitched_image.shape
-        padding = torch.ones((C, H, padding_width), dtype=stitched_image.dtype, device=stitched_image.device)
-        stitched_image = torch.cat((stitched_image, padding, image_tensors[i]), dim=2)
+#     for i in range(1, len(image_tensors)):
+#         # Determine random padding width (e.g., between 5 and 20 pixels)
+#         padding_width = random.randint(15, 20)
+#         # For PyTorch-style tensors (C, H, W)
+#         C, H, W = stitched_image.shape
+#         padding = torch.ones((C, H, padding_width), dtype=stitched_image.dtype, device=stitched_image.device)
+#         stitched_image = torch.cat((stitched_image, padding, image_tensors[i]), dim=2)
 
-    return stitched_image
+#     return stitched_image
 
 def form_line(image_path_list,text):
   base_image = Image.open(image_path_list[0]).convert('L')
@@ -175,9 +175,11 @@ def form_line(image_path_list,text):
     if text[i] not in cenders and text[i].lower() and len(text[i])==1:
       curr_line.small_word_size=64
       curr_line.baseline_dist+=64
-    print(f"{text[i]} : {curr_line}")
+
     curr_re_tensor = resize_img(curr_img_tensor,base_image_line,curr_line)
     img_tensors.append(curr_re_tensor)
-  print()
+
+    return img_tensors
   
-  return stitch_images_side_by_side(img_tensors)
+  
+#   return stitch_images_side_by_side(img_tensors)
