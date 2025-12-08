@@ -240,9 +240,13 @@ def main_sample(
 		file_paths.append(file_path)
 	
 	img_tensor_list = form_line(file_paths, text_list)
+	print(f"List size : {len(img_tensor_list)}")
+	print("Uploading to Azure Blob Storage...")
 
 	node_code = generate_node_code(uname)
 	blob_client = BlobClient()
+	print(blob_client.container_name)
+	print(blob_client.connection_string)
 	if upload(img_tensor_list, node_code, blob_client):
 		return (node_code, len(img_tensor_list))
 	else:
