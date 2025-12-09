@@ -21,7 +21,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install -r requirements.txt
+        python -m pip install --upgrade pip
+        pip install Pillow azure-storage-blob
         pip install pytest
 
     - name: Set PYTHONPATH
@@ -35,7 +36,7 @@ jobs:
         STYLES_BLOB_CONTAINER_NAME: ${{ secrets.STYLES_BLOB_CONTAINER_NAME }}
       run: |
         if [ -z "${AZURE_STORAGE_CONNECTION_STRING}" ]; then
-          echo "⚠️ Warning: No AZURE_STORAGE_CONNECTION_STRING secret configured."
+          echo "Warning: No AZURE_STORAGE_CONNECTION_STRING secret configured."
         else
           echo "Azure credentials loaded."
         fi

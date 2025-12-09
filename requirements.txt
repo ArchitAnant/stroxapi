@@ -14,3 +14,4 @@ torchvision
 tqdm
 transformers  
 wandb
+azure-storage-blob
