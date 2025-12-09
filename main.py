@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from model_pipeline import ModelPipeline
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
+from repo.fetch_styles import fetch_style_images
 
 
 app = FastAPI(title="Strox Handwrting Generation API")
@@ -46,15 +47,12 @@ async def generate_handwriting(payload: HandwritingRequest):
     style_code = payload.style_code
     
     # Fetch style images using style_code
-    # TODO: implement firebase for fetching style images
     style_images = fetch_style_images(style_code)
     
     style_image_paths = []
     for img in style_images:
-        contents = await img.read()
-        file_path = f"temp_{img.filename}"
-        with open(file_path, "wb") as f:
-            f.write(contents)
+        file_path = f"temp_{style_code}_{style_images.index(img)}.png"
+        img.save(file_path)
         style_image_paths.append(file_path)
     
     # Run your main function
