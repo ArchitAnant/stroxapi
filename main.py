@@ -5,8 +5,16 @@ from model_inference import main_sample
 from contextlib import asynccontextmanager
 from model_pipeline import ModelPipeline
 from fastapi import FastAPI, UploadFile, File
+from pydantic import BaseModel
+
 
 app = FastAPI(title="Strox Handwrting Generation API")
+
+class HandwritingRequest(BaseModel):
+    uname: str
+    texts: List[str]
+    style_code: str
+
 
 pipeline = None
 
@@ -28,26 +36,39 @@ def load_models():
         os.rmdir("out/")
 
 
-
 @app.post("/generate/")
-async def generate_handwriting(texts: List[str], style_images: List[UploadFile]):
+async def generate_handwriting(payload: HandwritingRequest):
     global pipeline
+    
+    # Unpack values
+    uname = payload.uname
+    texts = payload.texts
+    style_code = payload.style_code
+    
+    # Fetch style images using style_code
+    # TODO: implement firebase for fetching style images
+    style_images = fetch_style_images(style_code)
+    
     style_image_paths = []
     for img in style_images:
         contents = await img.read()
-        with open(f"temp_{img.filename}", "wb") as f:
+        file_path = f"temp_{img.filename}"
+        with open(file_path, "wb") as f:
             f.write(contents)
-        style_image_paths.append(f"temp_{img.filename}")
+        style_image_paths.append(file_path)
     
-    output_path = "generated_handwriting/"
-    main_sample(
+    # Run your main function
+    output_path = main_sample(
         model_pipeline=pipeline,
         text_list=texts,
         style_refs=style_image_paths,
-        out=output_path
+        uname=uname
     )
-    return {"message": "Handwriting generation completed.", "output_path": output_path}
-
+    
+    return {
+        "message": "Handwriting generation completed.",
+        "output_path": output_path
+    }
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

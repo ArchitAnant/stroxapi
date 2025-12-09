@@ -7,6 +7,9 @@ from diffusers import AutoencoderKL, DDIMScheduler
 from transformers import CanineTokenizer
 from model_pipeline import ModelPipeline
 from postpocessing.utils import form_line
+from repo.upload_main import upload,generate_node_code
+from repo.client import BlobClient
+
 
 
 
@@ -114,7 +117,7 @@ def main_sample(
 		model_pipeline: ModelPipeline,
 		text_list : List[str],
 		style_refs : List[str],
-		out : str,
+		uname : str,
 ):	
 	device = 'cuda'
 	if not torch.cuda.is_available():
@@ -176,11 +179,17 @@ def main_sample(
 		if image.size(0) == 4:  # latent decoded returns 3 channels
 			image = image[:3]
 		pil = transforms.ToPILImage()(image)
-		file_path = f"{out}/generated_{word_count}.png"
+		file_path = f"{uname}/generated_{word_count}.png"
 		pil.save(file_path)
 		file_paths.append(file_path)
 		print(f"Saved image to {file_path}")
-	
-	line_tensor = form_line(file_paths, text_list)
-	return line_tensor
+
+		img_tensor_list = form_line(file_paths, text_list)
+
+		node_code = generate_node_code(uname)
+		blob_client = BlobClient()
+		if upload(img_tensor_list, node_code, blob_client):
+			return (node_code, len(img_tensor_list))
+		else:
+			return None
 	
