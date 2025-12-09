@@ -1,10 +1,5 @@
 from azure.storage.blob import BlobServiceClient
 from dotenv import load_dotenv
-import firebase_admin
-from firebase_admin import credentials, firestore
-import base64
-import json
-import logging
 import os
 
 load_dotenv()
