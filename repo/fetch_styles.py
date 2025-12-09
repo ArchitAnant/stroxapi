@@ -1,4 +1,4 @@
-from client import BlobClient
+from .client import BlobClient
 from PIL import Image
 import io
 
@@ -9,7 +9,7 @@ def fetch_style_images(style_code):
     """
     style_image = []
     blob_client = BlobClient()
-    container_client = blob_client.container_client
+    container_client = blob_client.styles_container_client
     blob_list = container_client.list_blobs(name_starts_with=style_code)
     for blob in blob_list:
         blob_data = container_client.download_blob(blob.name)

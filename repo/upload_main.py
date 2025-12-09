@@ -15,8 +15,8 @@ def upload(img_list:List[Image.Image], node_code,blob_client):
         with io.BytesIO() as output:
             img.save(output, format="PNG")
             data = output.getvalue()
-            blob_client.container_client.upload_blob(name=blob_name, data=data, overwrite=True)
-        blob_url = f"https://{blob_client.blob_service_client.account_name}.blob.core.windows.net/{blob_client.container_client.container_name}/{blob_name}"
+            blob_client.generation_container_client.upload_blob(name=blob_name, data=data, overwrite=True)
+        blob_url = f"https://{blob_client.blob_service_client.account_name}.blob.core.windows.net/{blob_client.generation_container_client.container_name}/{blob_name}"
         base_upload_url = blob_url
     if base_upload_url is None:
         return False
@@ -28,7 +28,7 @@ def remove(node_code,n,blob_client):
     for idx in range(1,n+1):
         blob_name = f"{node_code}_image_{idx}.png"
         try:
-            blob_client.container_client.delete_blob(blob_name)
+            blob_client.generation_container_client.delete_blob(blob_name)
         except Exception as e:
             print(f"Error deleting blob {blob_name}: {e}")
     return True

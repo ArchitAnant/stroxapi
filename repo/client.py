@@ -11,7 +11,9 @@ load_dotenv()
 
 class BlobClient:
     connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-    container_name = os.getenv("BLOB_CONTAINER_NAME")
+    generation_container_name = os.getenv("GENERATION_BLOB_CONTAINER_NAME")
+    styles_container_name = os.getenv("STYLES_BLOB_CONTAINER_NAME")
     def __init__(self):
         self.blob_service_client = BlobServiceClient.from_connection_string(self.connection_string)
-        self.container_client = self.blob_service_client.get_container_client(self.container_name)
+        self.generation_container_client = self.blob_service_client.get_container_client(self.generation_container_name)
+        self.styles_container_client = self.blob_service_client.get_container_client(self.styles_container_name)
