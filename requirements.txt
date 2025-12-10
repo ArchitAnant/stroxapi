@@ -1,0 +1,17 @@
+diffusers
+einops
+numpy
+omegaconf
+opencv_contrib_python
+opencv_python
+opencv_python_headless
+Pillow
+protobuf
+python-dotenv
+scikit-image
+torch
+torchvision
+tqdm
+transformers  
+wandb
+azure-storage-blob
