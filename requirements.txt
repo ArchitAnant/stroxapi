@@ -15,3 +15,5 @@ tqdm
 transformers  
 wandb
 azure-storage-blob
+fastapi
+uvicorn
