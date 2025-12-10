@@ -184,7 +184,7 @@ def main_sample(
 		if not os.path.exists('tmp/'):
 			os.makedirs('tmp/')
 			print(f"Created directory: tmp/")
-			
+
 		if not os.path.exists(f'tmp/{uname}/'):
 			os.makedirs(f'tmp/{uname}/')
 			print(f"Created directory: tmp/{uname}/")
@@ -195,11 +195,15 @@ def main_sample(
 		print(f"Saved image to {file_path}")
 
 		img_tensor_list = form_line(file_paths, text_list)
+		img_list = []
+		for t in img_tensor_list:
+			img = transforms.ToPILImage()(t)
+			img_list.append(img)
 
 		node_code = generate_node_code(uname)
 		blob_client = BlobClient()
-		if upload(img_tensor_list, node_code, blob_client):
-			return (node_code, len(img_tensor_list))
+		if upload(img_list, node_code, blob_client):
+			return (node_code, len(img_list))
 		else:
 			return None
 	
