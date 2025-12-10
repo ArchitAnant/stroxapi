@@ -26,7 +26,9 @@ RUN wget https://huggingface.co/ari-archit/stable-diffusion-handwriting/resolve/
     -O handwriting_vae/vae/config.json
 
 # Download style model
-RUN wget https://huggingface.co/ari-archit/stable-diffusion-handwriting/resolve/main/mobilenetv3_iam_style_MIII-P5.pth \
+RUN pip install gdown
+
+RUN gdown gdown 1V5Pmw9j7vkzgLbXsW8v0b41uCQ0bWJXx \
     -O mobilenetv3_iam_style_MIII-P5.pth
 
 # Install Python libs
