@@ -159,6 +159,7 @@ def main_sample(
 	word_count = 0
 
 	file_paths = []
+	node_code = generate_node_code(uname)
 	# Sample
 	for text in text_list:
 		word_count+=1
@@ -200,10 +201,10 @@ def main_sample(
 			img = transforms.ToPILImage()(t)
 			img_list.append(img)
 
-		node_code = generate_node_code(uname)
+		
 		blob_client = BlobClient()
-		if upload(img_list, node_code, blob_client):
-			return (node_code, len(img_list))
-		else:
-			return None
+		upload(img_list, node_code, blob_client)
+		
+	return (node_code, len(img_list))
+		
 	
