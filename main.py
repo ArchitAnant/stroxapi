@@ -58,6 +58,8 @@ app = FastAPI(title="Strox Handwriting Generation API", lifespan=lifespan)
 @app.post("/generate/")
 async def generate_handwriting(payload: HandwritingRequest):
     global pipeline
+    print("RECEIVED:", payload.texts)
+    print("RECEIVED:", payload.style_code)
     
     uname = payload.uname
     texts = payload.texts
