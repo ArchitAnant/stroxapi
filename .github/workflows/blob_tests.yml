@@ -42,20 +42,23 @@ jobs:
           missing=1
         else
           echo "✔️ AZURE_STORAGE_CONNECTION_STRING loaded."
+          echo "AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}" >> $GITHUB_ENV
         fi
 
         if [ -z "${GENERATION_BLOB_CONTAINER_NAME}" ]; then
-          echo "Missing: GENERATION_BLOB_CONTAINER_NAME"
+          echo "⚠️ Missing: GENERATION_BLOB_CONTAINER_NAME"
           missing=1
         else
           echo "✔️ GENERATION_BLOB_CONTAINER_NAME loaded."
+          echo "GENERATION_BLOB_CONTAINER_NAME=${GENERATION_BLOB_CONTAINER_NAME}" >> $GITHUB_ENV
         fi
 
         if [ -z "${STYLES_BLOB_CONTAINER_NAME}" ]; then
-          echo "Missing: STYLES_BLOB_CONTAINER_NAME"
+          echo "⚠️ Missing: STYLES_BLOB_CONTAINER_NAME"
           missing=1
         else
           echo "✔️ STYLES_BLOB_CONTAINER_NAME loaded."
+          echo "STYLES_BLOB_CONTAINER_NAME=${STYLES_BLOB_CONTAINER_NAME}" >> $GITHUB_ENV
         fi
 
         if [ "$missing" -eq 1 ]; then
@@ -63,6 +66,7 @@ jobs:
         else
           echo "All Azure secrets loaded."
         fi
+
 
 
     - name: Run tests
