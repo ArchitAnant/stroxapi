@@ -9,6 +9,7 @@ from model_pipeline import ModelPipeline
 from postpocessing.utils import form_line
 from repo.upload_main import upload,generate_node_code
 from repo.client import BlobClient
+import os
 
 
 
@@ -179,7 +180,16 @@ def main_sample(
 		if image.size(0) == 4:  # latent decoded returns 3 channels
 			image = image[:3]
 		pil = transforms.ToPILImage()(image)
-		file_path = f"{uname}/generated_{word_count}.png"
+
+		if not os.path.exists('tmp/'):
+			os.makedirs('tmp/')
+			print(f"Created directory: tmp/")
+			
+		if not os.path.exists(f'tmp/{uname}/'):
+			os.makedirs(f'tmp/{uname}/')
+			print(f"Created directory: tmp/{uname}/")
+
+		file_path = f"tmp/{uname}/generated_{word_count}.png"
 		pil.save(file_path)
 		file_paths.append(file_path)
 		print(f"Saved image to {file_path}")
