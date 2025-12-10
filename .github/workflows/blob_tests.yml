@@ -35,11 +35,35 @@ jobs:
         GENERATION_BLOB_CONTAINER_NAME: ${{ secrets.GENERATION_BLOB_CONTAINER_NAME }}
         STYLES_BLOB_CONTAINER_NAME: ${{ secrets.STYLES_BLOB_CONTAINER_NAME }}
       run: |
+        missing=0
+
         if [ -z "${AZURE_STORAGE_CONNECTION_STRING}" ]; then
-          echo "Warning: No AZURE_STORAGE_CONNECTION_STRING secret configured."
+          echo "⚠️ Missing: AZURE_STORAGE_CONNECTION_STRING"
+          missing=1
         else
-          echo "Azure credentials loaded."
+          echo "✔️ AZURE_STORAGE_CONNECTION_STRING loaded."
         fi
+
+        if [ -z "${GENERATION_BLOB_CONTAINER_NAME}" ]; then
+          echo "Missing: GENERATION_BLOB_CONTAINER_NAME"
+          missing=1
+        else
+          echo "✔️ GENERATION_BLOB_CONTAINER_NAME loaded."
+        fi
+
+        if [ -z "${STYLES_BLOB_CONTAINER_NAME}" ]; then
+          echo "Missing: STYLES_BLOB_CONTAINER_NAME"
+          missing=1
+        else
+          echo "✔️ STYLES_BLOB_CONTAINER_NAME loaded."
+        fi
+
+        if [ "$missing" -eq 1 ]; then
+          echo "One or more Azure secrets are missing. Tests may fail."
+        else
+          echo "All Azure secrets loaded."
+        fi
+
 
     - name: Run tests
       run: pytest -vv
