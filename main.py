@@ -9,8 +9,6 @@ from pydantic import BaseModel
 from repo.fetch_styles import fetch_style_images
 
 
-app = FastAPI(title="Strox Handwrting Generation API")
-
 class HandwritingRequest(BaseModel):
     uname: str
     texts: List[str]
@@ -20,21 +18,31 @@ class HandwritingRequest(BaseModel):
 pipeline = None
 
 @asynccontextmanager
-def load_models():
+async def lifespan(app: FastAPI):
     global pipeline
+    
+    print("Loading models...")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
     pipeline = ModelPipeline(
         unet_path="unet_model.pth",
         vae_folder_path="vae_model/",
         style_encoder_path="mobilenetv3_iam_style_MIII-P5.pth",
         device=device
     )
+
+    print("Models loaded successfully.")
     yield
-    # if the out/ folder path exist delete that
+
+    print("Cleaning temporary files...")
     if os.path.exists("out/"):
         for f in os.listdir("out/"):
             os.remove(os.path.join("out/", f))
         os.rmdir("out/")
+    print("Shutdown completed.")
+
+
+app = FastAPI(title="Strox Handwriting Generation API", lifespan=lifespan)
 
 
 @app.post("/generate/")
