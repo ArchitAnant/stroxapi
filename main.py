@@ -130,4 +130,5 @@ if __name__ == "__main__":
     MODEL_CONFIG["style_encoder_path"] = args.style
 
     import uvicorn
+    port = int(os.environ.get("PORT", args.port))
     uvicorn.run(app, host="0.0.0.0", port=args.port)
