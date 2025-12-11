@@ -113,7 +113,7 @@ def parse_args():
 
     parser.add_argument(
         "--port",
-        default=8000,
+        default=8080,
         type=int,
         help="Port to run FastAPI server"
     )
@@ -131,4 +131,4 @@ if __name__ == "__main__":
 
     import uvicorn
     port = int(os.environ.get("PORT", args.port))
-    uvicorn.run(app, host="0.0.0.0", port=args.port)
+    uvicorn.run(app, host="0.0.0.0", port=port)
