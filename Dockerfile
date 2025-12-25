@@ -2,7 +2,7 @@ FROM python:3.10-slim
 
 # System deps
 RUN apt-get update && apt-get install -y \
-    git wget && \
+    git wget libgomp1 && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

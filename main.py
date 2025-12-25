@@ -56,7 +56,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Strox Handwriting Generation API", lifespan=lifespan)
 
 # health check endpoint
-@app.get("/health/")
+@app.get("/")
 async def health_check():
     return {"status": "ok"}
 
