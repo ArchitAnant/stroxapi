@@ -83,7 +83,8 @@ async def generate_handwriting(payload: HandwritingRequest):
         model_pipeline=pipeline,
         text_list=texts,
         style_refs=style_image_paths,
-        uname=uname
+        uname=uname,
+        device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
     )
     
     return {
