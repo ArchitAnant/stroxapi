@@ -88,11 +88,13 @@ async def generate_handwriting(payload: HandwritingRequest):
         device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
     )
     # check and remove the tmp/uname folder
-    folder_path = f"/tmp/{uname}"
+    base_tmp = "/tmp"
+    user_tmp = os.path.join(base_tmp, uname)
 
-    if os.path.isdir(folder_path):
-        shutil.rmtree(folder_path)
+    if os.path.isdir(user_tmp):
+        shutil.rmtree(user_tmp)
 
+    os.makedirs(user_tmp, exist_ok=True)
     
     return {
         "message": "Handwriting generation completed.",
