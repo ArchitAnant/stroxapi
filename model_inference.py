@@ -171,7 +171,7 @@ def main_sample(
                 device=device,
                 img_h=64,
                 img_w=256,
-                steps=100 if device=='cuda' else 30,
+                steps= 30,
             )
 		image = image_tensor[0].cpu()
 		if image.size(0) == 4:  # latent decoded returns 3 channels
