@@ -35,7 +35,7 @@ class ModelPipeline:
 		vocab_size=95,               # unused internally; placeholder
 		text_encoder=self.text_encoder,
 		args=SimpleArgs(interpolation=False, mix_rate=None),
-		use_fp16 = True 
+
 		)
 
 		self.unet = UNetModel(**unet_cfg).to(device)
