@@ -1,4 +1,5 @@
 import os
+import shutil
 import torch
 from typing import List
 from model_inference import main_sample
@@ -83,8 +84,17 @@ async def generate_handwriting(payload: HandwritingRequest):
         model_pipeline=pipeline,
         text_list=texts,
         style_refs=style_image_paths,
-        uname=uname
+        uname=uname,
+        device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
     )
+    # check and remove the tmp/uname folder
+    base_tmp = "/tmp"
+    user_tmp = os.path.join(base_tmp, uname)
+
+    if os.path.isdir(user_tmp):
+        shutil.rmtree(user_tmp)
+
+    os.makedirs(user_tmp, exist_ok=True)
     
     return {
         "message": "Handwriting generation completed.",
