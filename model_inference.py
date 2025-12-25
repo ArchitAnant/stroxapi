@@ -119,13 +119,9 @@ def main_sample(
 		text_list : List[str],
 		style_refs : List[str],
 		uname : str,
+		device : str
 ):	
-	device = 'cuda'
-	if not torch.cuda.is_available():
-		print("CUDA is needed.")
-		return
     
-
 	# tokenizer and text encoder
 	tokenizer = model_pipeline.text_tokenizer#CanineTokenizer.from_pretrained("google/canine-c")
 	text_encoder = model_pipeline.text_encoder#CanineModel.from_pretrained("google/canine-c").to(device)

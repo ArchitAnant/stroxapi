@@ -203,7 +203,7 @@ class CrossAttention(nn.Module):
         k = self.to_k(context)
         v = self.to_v(context)
 
-        mask = None #torch.ones(1, 8192).bool().cuda('cuda:6')
+        mask = None 
         
         q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> (b h) n d', h=h), (q, k, v))
         
